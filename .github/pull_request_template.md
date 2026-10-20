@@ -1,16 +1,12 @@
-## What changed?
+## What did you change?
 
-<!-- Describe the change and why it is needed. -->
+<!-- Briefly explain your changes. -->
 
-## Testing
+## Before requesting Ashish's approval
 
-- [ ] I ran the affected Webots world/controller.
-- [ ] I checked the Files changed tab for accidental files or deletions.
-- [ ] This branch is up to date with `main`.
-- [ ] No generated, temporary, or personal files are included.
+- [ ] I worked on my assigned branch, not `main`.
+- [ ] I tested the changes in Webots.
+- [ ] I checked **Files changed** for accidental changes or deletions.
+- [ ] I requested `@ASHTOW2102` (Ashish) as reviewer.
 
-## Reviewer
-
-- [ ] Ashish (`@ASHTOW2102`) has reviewed and approved this Pull Request.
-
-Only Ashish merges approved Pull Requests into `main`.
+Only Ashish accepts and merges this Pull Request into `main`.
