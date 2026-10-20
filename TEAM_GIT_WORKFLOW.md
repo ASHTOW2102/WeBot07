@@ -1,73 +1,47 @@
-# Safe team Git workflow
+# Simple team workflow
 
-`main` is the protected working version. Nobody writes directly to it. Every
-change starts in a short-lived feature branch and reaches `main` through a
-Pull Request reviewed and merged by Ashish (`@ASHTOW2102`).
+Each person always works on their own branch:
 
-## Create a feature branch
+- Ashish: `ashish`
+- Muqeem: `muqeem`
+- Shareeq: `shareeq`
+- LU: `lu`
 
-Start every task from the latest `main`. Use your name and a short task name:
+Do not push directly to `main`. Only Ashish (`@ASHTOW2102`) accepts and merges
+Pull Requests into `main`.
+
+## Each member makes changes
+
+Replace `YOUR_BRANCH` with your assigned branch name:
 
 ```powershell
-git switch main
-git fetch origin --prune
-git pull --ff-only origin main
-git switch -c feature/your-name-short-task
+git switch YOUR_BRANCH
+git pull --ff-only origin YOUR_BRANCH
 ```
 
-Examples are `feature/muqeem-goalkeeper`, `feature/shareeq-ball-tracking`, and
-`feature/lu-team-controller`. Never reuse a branch for an unrelated task.
-
-## Commit and publish the feature
+Make and test the changes, then run:
 
 ```powershell
-git branch --show-current
-git status
 git add --all
 git status
-git commit -m "Describe the completed change"
-git push -u origin HEAD
+git commit -m "Describe your change"
+git push origin YOUR_BRANCH
 ```
 
-Check the staged file list before committing. Do not include temporary files,
-local settings, generated output, or unrelated work.
+## Open a Pull Request
 
-## Open and compare the Pull Request
+On GitHub, open a Pull Request with:
 
-On GitHub, select **Pull requests**, then **New pull request**:
+- Base: `main`
+- Compare: your own branch
 
-- Base branch: `main`
-- Compare branch: your `feature/...` branch
+Check **Files changed**, explain what you changed, and request Ashish
+(`@ASHTOW2102`) as reviewer. Do not merge it yourself.
 
-In **Files changed**, inspect every added, changed, and deleted line. Complete
-the Pull Request checklist and request Ashish (`@ASHTOW2102`) as reviewer.
+## Ashish reviews and merges
 
-## Update a feature branch when main changes
-
-```powershell
-git switch feature/your-name-short-task
-git fetch origin --prune
-git rebase origin/main
-git push --force-with-lease
-```
-
-Use `git rebase --abort` if conflict resolution goes wrong. Never use plain
-`--force`, and never force-push `main`.
-
-## Approval, backup, and merge
-
-Ashish checks the file comparison, runs the affected Webots simulation, and
-approves only when it works. Repository protection must require:
-
-- A Pull Request before merging into `main`
-- One approving review
-- Code-owner review (`.github/CODEOWNERS` makes Ashish the code owner)
-- Dismissal of stale approvals after new commits
-- Resolved conversations
-- No force pushes and no deletion of `main`
-
-Immediately before merging, Ashish creates and publishes a backup branch and
-annotated tag from an up-to-date, clean local `main`:
+Ashish compares the files and tests the Webots project. Immediately before
+accepting the Pull Request, Ashish creates a backup:
 
 ```powershell
 git switch main
@@ -75,24 +49,18 @@ git pull --ff-only origin main
 .\scripts\backup-main.ps1
 ```
 
-Only after the script reports a published backup does Ashish use **Create a
-merge commit** on GitHub. This keeps the feature history and merge boundary
-visible.
+After the backup is published, Ashish accepts and merges the Pull Request on
+GitHub. Repository rules prevent other members from changing `main`.
 
-Do not delete a feature branch until the merge succeeds and the backup branch
-and tag are visible on GitHub.
+## After a Pull Request is merged
 
-## Recover a bad merge
-
-Do not rewrite shared history. Revert the merge with a new Pull Request:
+The member updates their own branch with the new `main`:
 
 ```powershell
-git switch main
-git pull --ff-only origin main
-git switch -c feature/ashish-revert-bad-merge
-git revert -m 1 MERGE_COMMIT_HASH
-git push -u origin HEAD
+git switch YOUR_BRANCH
+git fetch origin
+git merge origin/main
+git push origin YOUR_BRANCH
 ```
 
-The `backup/main-...` branch and `backup-main-...` tag preserve the exact
-pre-merge version on GitHub.
+Then they continue working on the same assigned branch.
