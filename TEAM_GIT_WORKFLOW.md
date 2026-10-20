@@ -1,119 +1,98 @@
 # Safe team Git workflow
 
-This repository uses `main` as the protected, working version of the project.
-Each team member works only on their own branch:
+`main` is the protected working version. Nobody writes directly to it. Every
+change starts in a short-lived feature branch and reaches `main` through a
+Pull Request reviewed and merged by Ashish (`@ASHTOW2102`).
 
-- Ashish: `ashish`
-- Muqeem: `muqeem`
-- Shareeq: `shareeq`
-- LU: `lu`
+## Create a feature branch
 
-## One-time setup for each member
-
-Clone the repository, then switch to your own branch:
+Start every task from the latest `main`. Use your name and a short task name:
 
 ```powershell
-git clone https://github.com/ASHTOW2102/WeBot07.git
-cd WeBot07
-git switch ashish     # Replace with your assigned branch name
-git pull --ff-only origin ashish
+git switch main
+git fetch origin --prune
+git pull --ff-only origin main
+git switch -c feature/your-name-short-task
 ```
 
-Configure your identity if Git asks for it:
+Examples are `feature/muqeem-goalkeeper`, `feature/shareeq-ball-tracking`, and
+`feature/lu-team-controller`. Never reuse a branch for an unrelated task.
+
+## Commit and publish the feature
 
 ```powershell
-git config user.name "Your Name"
-git config user.email "your-email@example.com"
-```
-
-## Normal daily work
-
-Always confirm the branch before editing:
-
-```powershell
-git status
 git branch --show-current
-```
-
-Save small, meaningful commits and push them to GitHub frequently:
-
-```powershell
+git status
 git add --all
 git status
 git commit -m "Describe the completed change"
-git push origin HEAD
+git push -u origin HEAD
 ```
 
-Do not work directly on `main`, and do not share one working folder between
-people. Each member should have their own clone.
+Check the staged file list before committing. Do not include temporary files,
+local settings, generated output, or unrelated work.
 
-## Bring the latest `main` into a member branch
+## Open and compare the Pull Request
 
-Do this before asking to merge your work:
+On GitHub, select **Pull requests**, then **New pull request**:
+
+- Base branch: `main`
+- Compare branch: your `feature/...` branch
+
+In **Files changed**, inspect every added, changed, and deleted line. Complete
+the Pull Request checklist and request Ashish (`@ASHTOW2102`) as reviewer.
+
+## Update a feature branch when main changes
 
 ```powershell
-git switch YOUR_BRANCH
-git status                         # Must be clean
+git switch feature/your-name-short-task
 git fetch origin --prune
 git rebase origin/main
-git push --force-with-lease origin YOUR_BRANCH
+git push --force-with-lease
 ```
 
-If a rebase conflict occurs, edit the marked files, test the project, then run:
+Use `git rebase --abort` if conflict resolution goes wrong. Never use plain
+`--force`, and never force-push `main`.
 
-```powershell
-git add PATH_TO_FIXED_FILE
-git rebase --continue
-```
+## Approval, backup, and merge
 
-Use `git rebase --abort` to return safely to the state before the rebase.
-Never use plain `--force`; use only `--force-with-lease` on your own branch.
+Ashish checks the file comparison, runs the affected Webots simulation, and
+approves only when it works. Repository protection must require:
 
-## Safe merge into `main` with a backup
+- A Pull Request before merging into `main`
+- One approving review
+- Code-owner review (`.github/CODEOWNERS` makes Ashish the code owner)
+- Dismissal of stale approvals after new commits
+- Resolved conversations
+- No force pushes and no deletion of `main`
 
-Only the integration lead should run these commands. Replace `YOUR_BRANCH`
-with one of `ashish`, `muqeem`, `shareeq`, or `lu`. Replace the timestamp with
-the current date and time, for example `2026-10-14-1530`.
-
-```powershell
-git switch main
-git status                              # Stop unless the tree is clean
-git pull --ff-only origin main
-git branch backup/main-2026-10-14-1530
-git tag -a backup-2026-10-14-1530 -m "Backup before merging YOUR_BRANCH"
-git push origin backup/main-2026-10-14-1530 backup-2026-10-14-1530
-git merge --no-ff origin/YOUR_BRANCH
-```
-
-Now run the Webots simulation/tests. Push `main` only after they pass:
-
-```powershell
-git push origin main
-```
-
-If the merge has conflicts or tests fail before committing the merge:
-
-```powershell
-git merge --abort
-```
-
-If a bad merge was already pushed, do not rewrite shared history. Restore it
-with a new commit:
+Immediately before merging, Ashish creates and publishes a backup branch and
+annotated tag from an up-to-date, clean local `main`:
 
 ```powershell
 git switch main
 git pull --ff-only origin main
+.\scripts\backup-main.ps1
+```
+
+Only after the script reports a published backup does Ashish use **Create a
+merge commit** on GitHub. This keeps the feature history and merge boundary
+visible.
+
+Do not delete a feature branch until the merge succeeds and the backup branch
+and tag are visible on GitHub.
+
+## Recover a bad merge
+
+Do not rewrite shared history. Revert the merge with a new Pull Request:
+
+```powershell
+git switch main
+git pull --ff-only origin main
+git switch -c feature/ashish-revert-bad-merge
 git revert -m 1 MERGE_COMMIT_HASH
-git push origin main
+git push -u origin HEAD
 ```
 
-The backup branch and tag remain on GitHub, so the exact pre-merge state is
-recoverable even if a computer is lost. GitHub branch protection should also
-be enabled for `main`: require a pull request, at least one approval, required
-tests, and disable force pushes and deletion.
-
-## Recommended review method
-
-After pushing a member branch, open a GitHub Pull Request from that branch into
-`main`. Another member reviews it. The integration lead then follows the backup
-steps above and merges only after Webots/testing succeeds.
+The `backup/main-...` branch and `backup-main-...` tag preserve the exact
+pre-merge version on GitHub.
