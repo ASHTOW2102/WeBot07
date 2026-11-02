@@ -51,4 +51,13 @@ P.ball.kickNoiseDir   = 0.05;  % rad, PLACEHOLDER direction noise (1 sigma)
 P.team.names        = {'Blue', 'Red'};
 P.team.attackDir    = [+1, -1];   % Blue attacks +x, Red attacks -x (global frame)
 P.team.defaultRoles = {'goalkeeper', 'defender', 'striker', 'striker'}; % by shirt number 1..4
+
+% goalkeeper (behaviours.goalkeeper + goalkeeperChart.sfx). Owner: Stream D (Ashish)
+P.team.keeper.lineOffset   = 0.30;  % m   guard line distance in front of own goal line. FIRST GUESS
+P.team.keeper.postMargin   = 0.20;  % m   stay this far inside each goal post. FIRST GUESS
+P.team.keeper.clearReach   = 0.10;  % m   enter CLEAR when ball gap is below this. FIRST GUESS
+P.team.keeper.clearExit    = 0.60;  % m   leave CLEAR when ball is this far away (hysteresis). FIRST GUESS
+P.team.keeper.shotMinSpeed = 0.20;  % m/s ball slower than this is not a shot. FIRST GUESS
+P.team.keeper.shotMargin   = 0.30;  % m   count shots aimed up to this far outside the posts. FIRST GUESS
+P.team.keeper.clearSpeed   = 2.5;   % m/s requested clearance kick speed. FIRST GUESS
 end
