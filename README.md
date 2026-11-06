@@ -54,3 +54,4 @@ robocup2d/
 - Behaviours keep the signature `[cmd, mem] = behaviours.<role>(obs, mem, P)` and never modify the world `W`.
 - Edit only the files your stream owns. Changes to shared files (`+util`, `tests`) or to the interface need team agreement.
 - Run `tests/run_tests.m` before every Friday merge. All tests must pass.
+
